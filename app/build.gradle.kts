@@ -58,7 +58,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.google.material) // Updated to use alias for material dependency
+    implementation(libs.google.material) // Using alias for Google Material dependency
     implementation("androidx.appcompat:appcompat:1.6.1") // Updated version
     implementation("androidx.recyclerview:recyclerview:1.3.1") // Updated version
     testImplementation(libs.junit)

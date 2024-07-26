@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -28,9 +29,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Create a LinearLayout as the root layout
-        val rootLayout = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
+        // Create a FrameLayout as the root layout
+        val rootLayout = FrameLayout(this).apply {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -39,10 +39,10 @@ class MainActivity : AppCompatActivity() {
 
         // Create RecyclerView programmatically
         recyclerView = RecyclerView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(
+            id = View.generateViewId()
+            layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                0,
-                1f
+                ViewGroup.LayoutParams.MATCH_PARENT
             )
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = ToDoAdapter(toDoList)
@@ -50,11 +50,16 @@ class MainActivity : AppCompatActivity() {
 
         // Create FloatingActionButton programmatically
         fab = FloatingActionButton(this).apply {
+            id = View.generateViewId()
             setImageResource(android.R.drawable.ic_input_add)
-            layoutParams = ViewGroup.LayoutParams(
+            layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+            ).apply {
+                val margin = resources.getDimensionPixelSize(R.dimen.fab_margin)
+                setMargins(margin, margin, margin, margin)
+                gravity = Gravity.BOTTOM or Gravity.END
+            }
             setOnClickListener {
                 val intent = Intent(this@MainActivity, AddItemActivity::class.java)
                 startActivityForResult(intent, ADD_ITEM_REQUEST_CODE)
@@ -83,9 +88,9 @@ class MainActivity : AppCompatActivity() {
     inner class ToDoAdapter(private val toDoList: List<ToDoItem>) : RecyclerView.Adapter<ToDoAdapter.ToDoViewHolder>() {
 
         inner class ToDoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val tvTitle: TextView = itemView.findViewById(1)
-            val tvDateTime: TextView = itemView.findViewById(2)
-            val ivPhoto: ImageView = itemView.findViewById(3)
+            val tvTitle: TextView = itemView.findViewById(View.generateViewId())
+            val tvDateTime: TextView = itemView.findViewById(View.generateViewId())
+            val ivPhoto: ImageView = itemView.findViewById(View.generateViewId())
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
@@ -96,21 +101,21 @@ class MainActivity : AppCompatActivity() {
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
                 addView(TextView(parent.context).apply {
-                    id = 1
+                    id = View.generateViewId()
                     layoutParams = LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
                     )
                 })
                 addView(TextView(parent.context).apply {
-                    id = 2
+                    id = View.generateViewId()
                     layoutParams = LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
                     )
                 })
                 addView(ImageView(parent.context).apply {
-                    id = 3
+                    id = View.generateViewId()
                     layoutParams = LinearLayout.LayoutParams(
                         100,
                         100
@@ -126,6 +131,7 @@ class MainActivity : AppCompatActivity() {
             holder.tvTitle.text = item.title
             holder.tvDateTime.text = item.dateTime
             if (item.photoUri != null) {
+                holder.ivPhoto.visibility = View.VISIBLE
                 holder.ivPhoto.setImageURI(Uri.parse(item.photoUri))
             } else {
                 holder.ivPhoto.visibility = View.GONE
@@ -133,80 +139,5 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun getItemCount(): Int = toDoList.size
-    }
-
-    class AddItemActivity : AppCompatActivity() {
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-
-            // Create a LinearLayout as the root layout
-            val rootLayout = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-            }
-
-            // Create EditText for title input
-            val etTitle = EditText(this).apply {
-                hint = "Enter task title"
-                layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            }
-
-            // Create DatePicker for date input
-            val dpDate = DatePicker(this).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            }
-
-            // Create TimePicker for time input
-            val tpTime = TimePicker(this).apply {
-                setIs24HourView(true)
-                layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            }
-
-            // Create Button for adding the item
-            val btnAdd = Button(this).apply {
-                text = "Add Task"
-                layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-                setOnClickListener {
-                    val title = etTitle.text.toString()
-                    val day = dpDate.dayOfMonth
-                    val month = dpDate.month + 1
-                    val year = dpDate.year
-                    val hour = tpTime.hour
-                    val minute = tpTime.minute
-                    val dateTime = "$day/$month/$year $hour:$minute"
-
-                    val resultIntent = Intent().apply {
-                        putExtra("title", title)
-                        putExtra("dateTime", dateTime)
-                    }
-                    setResult(Activity.RESULT_OK, resultIntent)
-                    finish()
-                }
-            }
-
-            // Add views to the root layout
-            rootLayout.addView(etTitle)
-            rootLayout.addView(dpDate)
-            rootLayout.addView(tpTime)
-            rootLayout.addView(btnAdd)
-
-            // Set the root layout as the content view
-            setContentView(rootLayout)
-        }
     }
 }
