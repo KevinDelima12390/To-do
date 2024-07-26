@@ -1,10 +1,11 @@
 package com.example.simpletodoapp
 
 import android.app.Activity
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.util.Calendar
 
 data class ToDoItem(
     val title: String,
@@ -29,8 +31,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Create a FrameLayout as the root layout
-        val rootLayout = FrameLayout(this).apply {
+        // Create a LinearLayout as the root layout
+        val rootLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -40,9 +43,10 @@ class MainActivity : AppCompatActivity() {
         // Create RecyclerView programmatically
         recyclerView = RecyclerView(this).apply {
             id = View.generateViewId()
-            layoutParams = FrameLayout.LayoutParams(
+            layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
+                0,
+                1f
             )
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = ToDoAdapter(toDoList)
@@ -50,16 +54,11 @@ class MainActivity : AppCompatActivity() {
 
         // Create FloatingActionButton programmatically
         fab = FloatingActionButton(this).apply {
-            id = View.generateViewId()
             setImageResource(android.R.drawable.ic_input_add)
-            layoutParams = FrameLayout.LayoutParams(
+            layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply {
-                val margin = resources.getDimensionPixelSize(R.dimen.fab_margin)
-                setMargins(margin, margin, margin, margin)
-                gravity = Gravity.BOTTOM or Gravity.END
-            }
+            )
             setOnClickListener {
                 val intent = Intent(this@MainActivity, AddItemActivity::class.java)
                 startActivityForResult(intent, ADD_ITEM_REQUEST_CODE)
@@ -88,9 +87,9 @@ class MainActivity : AppCompatActivity() {
     inner class ToDoAdapter(private val toDoList: List<ToDoItem>) : RecyclerView.Adapter<ToDoAdapter.ToDoViewHolder>() {
 
         inner class ToDoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val tvTitle: TextView = itemView.findViewById(View.generateViewId())
-            val tvDateTime: TextView = itemView.findViewById(View.generateViewId())
-            val ivPhoto: ImageView = itemView.findViewById(View.generateViewId())
+            val tvTitle: TextView = itemView.findViewById(1)
+            val tvDateTime: TextView = itemView.findViewById(2)
+            val ivPhoto: ImageView = itemView.findViewById(3)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
@@ -101,21 +100,21 @@ class MainActivity : AppCompatActivity() {
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
                 addView(TextView(parent.context).apply {
-                    id = View.generateViewId()
+                    id = 1
                     layoutParams = LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
                     )
                 })
                 addView(TextView(parent.context).apply {
-                    id = View.generateViewId()
+                    id = 2
                     layoutParams = LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
                     )
                 })
                 addView(ImageView(parent.context).apply {
-                    id = View.generateViewId()
+                    id = 3
                     layoutParams = LinearLayout.LayoutParams(
                         100,
                         100
@@ -131,7 +130,6 @@ class MainActivity : AppCompatActivity() {
             holder.tvTitle.text = item.title
             holder.tvDateTime.text = item.dateTime
             if (item.photoUri != null) {
-                holder.ivPhoto.visibility = View.VISIBLE
                 holder.ivPhoto.setImageURI(Uri.parse(item.photoUri))
             } else {
                 holder.ivPhoto.visibility = View.GONE
