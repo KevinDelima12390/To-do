@@ -1,12 +1,15 @@
 package com.example.simpletodoapp
 
+import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -42,7 +45,7 @@ class MainActivity : AppCompatActivity() {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
-            setBackgroundColor(ContextCompat.getColor(this@MainActivity, android.R.color.black))
+            setBackgroundColor(Color.LTGRAY)
             setPadding(16, 16, 16, 16)
         }
 
@@ -60,8 +63,7 @@ class MainActivity : AppCompatActivity() {
 
         fab = FloatingActionButton(this).apply {
             setImageResource(android.R.drawable.ic_input_add)
-            setColorFilter(ContextCompat.getColor(this@MainActivity, android.R.color.white))
-            setBackgroundColor(ContextCompat.getColor(this@MainActivity, android.R.color.black))
+            backgroundTintList = ContextCompat.getColorStateList(this@MainActivity, android.R.color.holo_blue_dark)
             layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -72,6 +74,11 @@ class MainActivity : AppCompatActivity() {
             setOnClickListener {
                 val intent = Intent(this@MainActivity, AddItemActivity::class.java)
                 startActivityForResult(intent, ADD_ITEM_REQUEST_CODE)
+                ObjectAnimator.ofFloat(this, "rotation", 0f, 360f).apply {
+                    duration = 500
+                    interpolator = DecelerateInterpolator()
+                    start()
+                }
             }
         }
 
@@ -122,7 +129,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 radius = 16f
                 cardElevation = 8f
-                setCardBackgroundColor(ContextCompat.getColor(context, android.R.color.black))
+                setCardBackgroundColor(Color.WHITE)
                 setPadding(16, 16, 16, 16)
 
                 addView(LinearLayout(parent.context).apply {
@@ -135,7 +142,7 @@ class MainActivity : AppCompatActivity() {
                     addView(TextView(parent.context).apply {
                         id = 1001
                         textSize = 18f
-                        setTextColor(ContextCompat.getColor(parent.context, android.R.color.white))
+                        setTextColor(Color.BLACK)
                         layoutParams = LinearLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -146,7 +153,7 @@ class MainActivity : AppCompatActivity() {
                     addView(TextView(parent.context).apply {
                         id = 1002
                         textSize = 16f
-                        setTextColor(ContextCompat.getColor(parent.context, android.R.color.darker_gray))
+                        setTextColor(Color.DKGRAY)
                         layoutParams = LinearLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -167,7 +174,7 @@ class MainActivity : AppCompatActivity() {
                     addView(CheckBox(parent.context).apply {
                         id = 1004
                         text = "Completed"
-                        setTextColor(ContextCompat.getColor(parent.context, android.R.color.white))
+                        setTextColor(Color.BLACK)
                         setOnCheckedChangeListener { _, isChecked ->
                             // Handle completion status
                         }
@@ -181,8 +188,8 @@ class MainActivity : AppCompatActivity() {
                     addView(Button(parent.context).apply {
                         id = 1005
                         text = "Delete"
-                        setBackgroundColor(ContextCompat.getColor(parent.context, android.R.color.white))
-                        setTextColor(ContextCompat.getColor(parent.context, android.R.color.black))
+                        setBackgroundColor(Color.RED)
+                        setTextColor(Color.WHITE)
                         layoutParams = LinearLayout.LayoutParams(
                             ViewGroup.LayoutParams.WRAP_CONTENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -208,12 +215,23 @@ class MainActivity : AppCompatActivity() {
 
             holder.itemView.setOnClickListener {
                 showDetailView(item, position)
+                ObjectAnimator.ofFloat(holder.itemView, "alpha", 0f, 1f).apply {
+                    duration = 500
+                    start()
+                }
             }
 
             holder.btnDelete.setOnClickListener {
-                toDoList.removeAt(position)
-                notifyItemRemoved(position)
-                notifyItemRangeChanged(position, toDoList.size)
+                val position = holder.adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    toDoList.removeAt(position)
+                    notifyItemRemoved(position)
+                    notifyItemRangeChanged(position, toDoList.size)
+                    ObjectAnimator.ofFloat(holder.itemView, "translationX", 0f, -1000f).apply {
+                        duration = 500
+                        start()
+                    }
+                }
             }
         }
 
@@ -228,19 +246,19 @@ class MainActivity : AppCompatActivity() {
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
             setPadding(32, 32, 32, 32)
-            setBackgroundColor(ContextCompat.getColor(this@MainActivity, android.R.color.black))
+            setBackgroundColor(Color.LTGRAY)
         }
 
         val tvTitle = TextView(this).apply {
             text = item.title
             textSize = 24f
-            setTextColor(ContextCompat.getColor(this@MainActivity, android.R.color.white))
+            setTextColor(Color.BLACK)
         }
 
         val tvDateTime = TextView(this).apply {
             text = item.dateTime
             textSize = 18f
-            setTextColor(ContextCompat.getColor(this@MainActivity, android.R.color.darker_gray))
+            setTextColor(Color.DKGRAY)
             layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -267,8 +285,8 @@ class MainActivity : AppCompatActivity() {
 
         val backButton = Button(this).apply {
             text = "Back"
-            setBackgroundColor(ContextCompat.getColor(this@MainActivity, android.R.color.white))
-            setTextColor(ContextCompat.getColor(this@MainActivity, android.R.color.black))
+            setBackgroundColor(Color.BLUE)
+            setTextColor(Color.WHITE)
             setOnClickListener {
                 createMainView()
             }
