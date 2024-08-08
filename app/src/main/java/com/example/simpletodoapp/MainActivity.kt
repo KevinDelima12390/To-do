@@ -4,14 +4,16 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import androidx.core.content.ContextCompat
 
 data class ToDoItem(
     val title: String,
@@ -30,12 +32,18 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        createMainView()
+    }
+
+    private fun createMainView() {
         val rootLayout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
+            setBackgroundColor(ContextCompat.getColor(this@MainActivity, android.R.color.black))
+            setPadding(16, 16, 16, 16)
         }
 
         recyclerView = RecyclerView(this).apply {
@@ -47,14 +55,20 @@ class MainActivity : AppCompatActivity() {
             )
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = ToDoAdapter(toDoList)
+            setPadding(8, 8, 8, 8)
         }
 
         fab = FloatingActionButton(this).apply {
             setImageResource(android.R.drawable.ic_input_add)
+            setColorFilter(ContextCompat.getColor(this@MainActivity, android.R.color.white))
+            setBackgroundColor(ContextCompat.getColor(this@MainActivity, android.R.color.black))
             layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+            ).apply {
+                gravity = Gravity.END or Gravity.BOTTOM
+                setMargins(0, 0, 16, 16)
+            }
             setOnClickListener {
                 val intent = Intent(this@MainActivity, AddItemActivity::class.java)
                 startActivityForResult(intent, ADD_ITEM_REQUEST_CODE)
@@ -97,58 +111,85 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
-            val itemView = LinearLayout(parent.context).apply {
-                orientation = LinearLayout.VERTICAL
+            val itemView = CardView(parent.context).apply {
                 layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
-                )
+                ).apply {
+                    if (this is ViewGroup.MarginLayoutParams) {
+                        setMargins(8, 8, 8, 8)
+                    }
+                }
+                radius = 16f
+                cardElevation = 8f
+                setCardBackgroundColor(ContextCompat.getColor(context, android.R.color.black))
                 setPadding(16, 16, 16, 16)
 
-                addView(TextView(parent.context).apply {
-                    id = 1001
-                    textSize = 18f
-                    setTextColor(ContextCompat.getColor(parent.context, android.R.color.black))
-                    layoutParams = LinearLayout.LayoutParams(
+                addView(LinearLayout(parent.context).apply {
+                    orientation = LinearLayout.VERTICAL
+                    layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
                     )
-                })
-                addView(TextView(parent.context).apply {
-                    id = 1002
-                    textSize = 16f
-                    setTextColor(ContextCompat.getColor(parent.context, android.R.color.darker_gray))
-                    layoutParams = LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    )
-                })
-                addView(ImageView(parent.context).apply {
-                    id = 1003
-                    layoutParams = LinearLayout.LayoutParams(
-                        100,
-                        100
-                    )
-                    scaleType = ImageView.ScaleType.CENTER_CROP
-                })
-                addView(CheckBox(parent.context).apply {
-                    id = 1004
-                    text = "Completed"
-                    setOnCheckedChangeListener { _, isChecked ->
-                        // Handle completion status
-                    }
-                    layoutParams = LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    )
-                })
-                addView(Button(parent.context).apply {
-                    id = 1005
-                    text = "Delete"
-                    layoutParams = LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    )
+
+                    addView(TextView(parent.context).apply {
+                        id = 1001
+                        textSize = 18f
+                        setTextColor(ContextCompat.getColor(parent.context, android.R.color.white))
+                        layoutParams = LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        ).apply {
+                            setMargins(0, 0, 0, 8)
+                        }
+                    })
+                    addView(TextView(parent.context).apply {
+                        id = 1002
+                        textSize = 16f
+                        setTextColor(ContextCompat.getColor(parent.context, android.R.color.darker_gray))
+                        layoutParams = LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        ).apply {
+                            setMargins(0, 0, 0, 8)
+                        }
+                    })
+                    addView(ImageView(parent.context).apply {
+                        id = 1003
+                        layoutParams = LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            200
+                        ).apply {
+                            setMargins(0, 8, 0, 8)
+                        }
+                        scaleType = ImageView.ScaleType.CENTER_CROP
+                    })
+                    addView(CheckBox(parent.context).apply {
+                        id = 1004
+                        text = "Completed"
+                        setTextColor(ContextCompat.getColor(parent.context, android.R.color.white))
+                        setOnCheckedChangeListener { _, isChecked ->
+                            // Handle completion status
+                        }
+                        layoutParams = LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        ).apply {
+                            setMargins(0, 8, 0, 8)
+                        }
+                    })
+                    addView(Button(parent.context).apply {
+                        id = 1005
+                        text = "Delete"
+                        setBackgroundColor(ContextCompat.getColor(parent.context, android.R.color.white))
+                        setTextColor(ContextCompat.getColor(parent.context, android.R.color.black))
+                        layoutParams = LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        ).apply {
+                            setMargins(0, 8, 0, 8)
+                        }
+                    })
                 })
             }
             return ToDoViewHolder(itemView)
@@ -187,13 +228,13 @@ class MainActivity : AppCompatActivity() {
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
             setPadding(32, 32, 32, 32)
-            setBackgroundColor(ContextCompat.getColor(this@MainActivity, android.R.color.white))
+            setBackgroundColor(ContextCompat.getColor(this@MainActivity, android.R.color.black))
         }
 
         val tvTitle = TextView(this).apply {
             text = item.title
             textSize = 24f
-            setTextColor(ContextCompat.getColor(this@MainActivity, android.R.color.black))
+            setTextColor(ContextCompat.getColor(this@MainActivity, android.R.color.white))
         }
 
         val tvDateTime = TextView(this).apply {
@@ -224,9 +265,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val backButton = Button(this).apply {
+            text = "Back"
+            setBackgroundColor(ContextCompat.getColor(this@MainActivity, android.R.color.white))
+            setTextColor(ContextCompat.getColor(this@MainActivity, android.R.color.black))
+            setOnClickListener {
+                createMainView()
+            }
+        }
+
         detailLayout.addView(tvTitle)
         detailLayout.addView(tvDateTime)
         detailLayout.addView(ivPhoto)
+        detailLayout.addView(backButton)
 
         setContentView(detailLayout)
     }
