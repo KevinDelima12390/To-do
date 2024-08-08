@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import java.util.Calendar
 
 class AddItemActivity : AppCompatActivity() {
@@ -19,41 +20,49 @@ class AddItemActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Create a LinearLayout as the root layout
         val rootLayout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
+            setPadding(32, 32, 32, 32)  // Add padding to the root layout
         }
 
-        // Create EditText for title input
         etTitle = EditText(this).apply {
             hint = "Enter task title"
+            textSize = 18f
+            setTextColor(ContextCompat.getColor(context, android.R.color.black))
+            background = ContextCompat.getDrawable(context, android.R.drawable.editbox_background_normal)  // Set background
             layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+            ).apply {
+                setMargins(0, 0, 0, 16)  // Margin below the EditText
+            }
         }
 
-        // Create Button for date and time picker
         btnPickDateTime = Button(this).apply {
             text = "Pick Date and Time"
+            setTextColor(ContextCompat.getColor(context, android.R.color.black))
+            background = ContextCompat.getDrawable(context, android.R.drawable.btn_default)  // Set button background
             layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+            ).apply {
+                setMargins(0, 0, 0, 16)  // Margin below the button
+            }
             setOnClickListener {
                 showDateTimePicker()
             }
         }
 
-        // Create Button for adding the item
         btnAdd = Button(this).apply {
             text = "Add Task"
+            setTextColor(ContextCompat.getColor(context, android.R.color.black))
+            background = ContextCompat.getDrawable(context, android.R.drawable.btn_default)  // Set button background
             layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
             setOnClickListener {
@@ -71,12 +80,10 @@ class AddItemActivity : AppCompatActivity() {
             }
         }
 
-        // Add views to the root layout
         rootLayout.addView(etTitle)
         rootLayout.addView(btnPickDateTime)
         rootLayout.addView(btnAdd)
 
-        // Set the root layout as the content view
         setContentView(rootLayout)
     }
 
